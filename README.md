@@ -55,7 +55,29 @@ Since the Render service in the free plan does not have a built-in persistent da
  - Copy the Connection String link which will be in the form:
  ```
 mongodb+srv://<username>:<password>@cluster0.xxx.mongodb.net/<dbname>?retryWrites=true&w=majority
-
 ```
 
  - Change <username>, <password> and <dbname> to your real data
+
+### 3.Set .ENV
+**Creating and setting up.env files**
+The.env file is used to store Sensitive Data such as Secret Key and Database URI so that they do not fall out in the Public Repository
+
+**Create an.env file in the project's Root Folder**
+Example of content in an.env file:Code information
+```
+MONGO_URI=YOUR_MONGO_URL
+MONGO_DB_NAME=HSHO
+JWT_SECRET=very-good-key
+STEAM_API_KEY=YOUR_STEAM_API_KEY
+PORT=3000
+```
+3.1 Create a.gitignore file (very important!)
+Create a file named.gitignore at Root Folder to prevent GitHub from pulling an.env or node_modules file online:
+```
+node_modules/
+.env
+dist/
+certs/*.key
+certs/*.crt
+```
