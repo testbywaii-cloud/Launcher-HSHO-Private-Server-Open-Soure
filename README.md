@@ -23,14 +23,14 @@ This is the private launcher server of the game **Home Sweet Home Online** It ru
  ```
 ### 2.Set MongoDB
 
-**MongoDB Atlas (Database on Cloud) Settings**
+**MongoDB Atlas (Database on Cloud)** Settings
 Since the Render service in the free plan does not have a built-in persistent database system, the MongoDB Atlas is recommended (512 MB free)
 
-1.Apply/Access at MongoDB Atlas
+1. Apply/Access at MongoDB Atlas
 
-2.Create Database Cluster (Choose Free/Shared M0 Plan)
+2. Create Database Cluster (Choose Free/Shared M0 Plan)
 
-3.Set up Network Access (IP Access List):
+3. Set up Network Access (IP Access List):
 
  - Go to the Network Access bar on the left
 
@@ -38,21 +38,24 @@ Since the Render service in the free plan does not have a built-in persistent da
 
  - Select Allow Access From Anywhere (0.0.0.0/0) so Render can connect, and press Confirm
 
-Set Database User:
+4. Set Database User:
 
-Go to Database Access bar
+ - Go to Database Access bar
 
-Press Add New Database User
+ - Press Add New Database User
 
-Set Username and Password (take note of this key) and press Add User
+ - Set Username and Password (take note of this key) and press Add User
 
-Pull Connection String (Mongo URI):
+5. Pull Connection String (Mongo URI):
 
-Go to the Database page, press the Connect button on your Cluster
+ - Go to the Database page, press the Connect button on your Cluster
 
-Select Drivers (Node.js)
+ - Select Drivers (Node.js)
 
-Copy the Connection String link which will be in the form:
+ - Copy the Connection String link which will be in the form:
+ ```
 mongodb+srv://<username>:<password>@cluster0.xxx.mongodb.net/<dbname>?retryWrites=true&w=majority
 
-Change <username>, <password> and <dbname> to your real data
+```
+
+ - Change <username>, <password> and <dbname> to your real data
