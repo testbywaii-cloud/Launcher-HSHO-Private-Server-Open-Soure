@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LYWP Private Launcher - Liquid Glass Edition</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+      user-select: none;
+    }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #090a0f url('bg.jpg') no-repeat center center;
+      background-size: cover;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Background Fluid Glows */
+    body::before {
+      content: '';
+      position: absolute;
+      top: -10%;
+      left: -10%;
+      width: 50vw;
+      height: 50vw;
+      background: radial-gradient(circle, rgba(0, 198, 255, 0.12), transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: absolute;
+      bottom: -10%;
+      right: -10%;
+      width: 50vw;
+      height: 50vw;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.12), transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Shared Liquid Glass Classes */
+    .liquid-glass {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 100%);
+      backdrop-filter: blur(25px) saturate(200%);
+      -webkit-backdrop-filter: blur(25px) saturate(200%);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 1px 1px 0 rgba(255, 255, 255, 0.3);
+    }
+
+    .liquid-glass-card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-top: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .liquid-glass-input {
+      background: rgba(255, 255, 255, 0.07) !important;
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.18) !important;
+      color: #fff !important;
+      border-radius: 8px;
+    }
+
+    .liquid-glass-btn {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-top: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      color: #fff;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    .liquid-glass-btn:hover {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.1) 100%);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-2px);
+    }
+
+    /* Titlebar */
+    .titlebar {
+      height: 38px;
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(30px) saturate(200%);
+      -webkit-backdrop-filter: blur(30px) saturate(200%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 16px;
+      -webkit-app-region: drag;
+      z-index: 100;
+    }
+
+    .titlebar span {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .titlebar-btns {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      -webkit-app-region: no-drag;
+    }
+
+    .titlebar-btn {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .titlebar-btn:hover { opacity: 0.8; transform: scale(1.1); }
+    .btn-min { background: #ffbd2e; }
+    .btn-max { background: #28c940; }
+    .btn-close { background: #ff5f56; }
+
+    /* Main Container Structure */
+    .app-container {
+      flex: 1;
+      height: calc(100vh - 38px);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Top News Toggle Button */
+    .toggle-news-btn {
+      position: absolute;
+      top: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 48px;
+      height: 30px;
+      border-radius: 15px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .toggle-news-btn.open { transform: translateX(-50%) rotate(180deg); }
+
+    /* News Sliding Panel */
+    .news-panel {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(12, 14, 24, 0.85) 0%, rgba(5, 7, 15, 0.9) 100%);
+      backdrop-filter: blur(35px) saturate(200%);
+      -webkit-backdrop-filter: blur(35px) saturate(200%);
+      transform: translateY(-100%);
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 10;
+      padding: 70px 40px 30px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .news-panel.active { transform: translateY(0); }
+
+    .news-grid {
+      display: flex;
+      gap: 25px;
+      margin-top: 20px;
+      width: 100%;
+      max-width: 750px;
+      justify-content: center;
+    }
+
+    .news-card {
+      flex: 1;
+      height: 190px;
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      transition: all 0.3s ease;
+    }
+
+    .news-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255, 255, 255, 0.35);
+    }
+
+    .news-card img {
+      width: 120px;
+      height: 100%;
+      object-fit: cover;
+      border-right: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .news-card-content {
+      flex: 1;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .news-card-title {
+      font-size: 14px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+
+    .news-card-desc {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.75);
+      line-height: 1.5;
+    }
+
+    .divider {
+      width: 100%;
+      max-width: 750px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      margin: 35px 0 25px 0;
+    }
+
+    .brand-logo {
+      height: 80px;
+      object-fit: contain;
+    }
+
+    /* BOTTOM LEFT CONTROL GROUP */
+    .bottom-left-controls {
+      position: absolute;
+      bottom: 25px;
+      left: 25px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 220px;
+      z-index: 5;
+    }
+
+    .small-btn-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-action-small {
+      flex: 1;
+      height: 36px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      border-radius: 8px;
+    }
+
+    .btn-play-container {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* 🔍 ปรับขนาดตัวอักษรปุ่มเข้าเกมให้เล็กลงเรียบร้อย */
+    .btn-play {
+      flex: 1;
+      height: 44px;
+      font-size: 12px; /* ปรับลดจาก 15px เหลือ 12px */
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #ffffff;
+      background: linear-gradient(135deg, rgba(235, 59, 90, 0.8) 0%, rgba(180, 20, 50, 0.9) 100%);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-top: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 22px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      box-shadow: 0 8px 20px rgba(235, 59, 90, 0.4);
+    }
+
+    .btn-play:hover {
+      background: linear-gradient(135deg, rgba(255, 75, 105, 0.9) 0%, rgba(200, 30, 60, 1) 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 25px rgba(235, 59, 90, 0.6);
+    }
+
+    .btn-settings {
+      width: 44px;
+      height: 44px;
+      font-size: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .server-select-mini {
+      width: 100%;
+      height: 32px;
+      padding: 0 10px;
+      font-size: 11px;
+      margin-top: 4px;
+    }
+    .server-select-mini option { background: #14151f; color: #fff; }
+
+    /* BOTTOM RIGHT SPECS BOX */
+    .bottom-right-specs {
+      position: absolute;
+      bottom: 25px;
+      right: 25px;
+      width: 260px;
+      padding: 16px;
+      border-radius: 16px;
+      z-index: 5;
+    }
+
+    .specs-title {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      padding-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: #00ff88;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #00ff88;
+      display: inline-block;
+    }
+    .status-dot.offline { background: #ff4757; box-shadow: 0 0 8px #ff4757; }
+
+    .specs-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 11px;
+    }
+
+    .specs-item {
+      display: flex;
+      justify-content: space-between;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .specs-item span:last-child {
+      color: #fff;
+      font-weight: 600;
+      max-width: 160px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: right;
+    }
+
+    .disk-warning {
+      color: #ff6b6b;
+      font-size: 10px;
+      margin-top: 4px;
+      font-weight: 700;
+    }
+
+    /* POPUP SETTING OVERLAY STYLES */
+    .settings-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .settings-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .settings-modal {
+      width: 90%;
+      max-width: 1050px;
+      height: 80vh;
+      display: flex;
+      gap: 16px;
+      position: relative;
+    }
+
+    .settings-close-btn {
+      position: absolute;
+      top: -12px;
+      right: -12px;
+      width: 34px;
+      height: 34px;
+      background: linear-gradient(135deg, #ff5f56 0%, #ff3b30 100%);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
+      color: #fff;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 10;
+      box-shadow: 0 4px 15px rgba(255, 95, 86, 0.5);
+    }
+
+    .settings-left-panel {
+      width: 290px;
+      height: 100%;
+      border-radius: 18px;
+      padding: 22px 18px;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .settings-title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #ffffff;
+      margin-bottom: 18px;
+      text-transform: uppercase;
+    }
+
+    .settings-menu-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .glass-btn-side {
+      width: 100%;
+      height: 40px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 12px;
+      color: #e2e8f0;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 10px;
+      backdrop-filter: blur(15px);
+      transition: all 0.3s;
+    }
+
+    .glass-btn-side:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+    }
+
+    .version-section-popup {
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .version-title-popup { font-size: 11px; font-weight: 800; color: rgba(255, 255, 255, 0.9); }
+    .version-info { font-size: 10px; color: rgba(255, 255, 255, 0.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .version-input-group { display: flex; align-items: center; gap: 6px; }
+    .version-label { font-size: 11px; color: #ccc; }
+    .version-label strong { color: #ffd700; }
+
+    .version-input-group input[type="text"] {
+      flex: 1; padding: 6px 10px; font-size: 11px; outline: none; min-width: 0;
+    }
+
+    .btn-sidebar-save {
+      background: linear-gradient(135deg, rgba(40, 167, 69, 0.8) 0%, rgba(30, 126, 52, 0.9) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #fff; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: bold;
+    }
+
+    .version-status { font-size: 10px; min-height: 12px; color: #aaa; }
+
+    .settings-right-panel {
+      flex: 1; height: 100%; border-radius: 18px; padding: 26px; overflow-y: auto; display: flex; flex-direction: column; gap: 22px;
+    }
+
+    .setting-section-title {
+      font-size: 13px; font-weight: 800; color: #ffd700; border-bottom: 1px solid rgba(255, 255, 255, 0.15); padding-bottom: 8px; text-transform: uppercase;
+    }
+
+    .setting-group { display: flex; flex-direction: column; gap: 12px; }
+
+    .setting-item {
+      display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-radius: 10px;
+    }
+
+    .setting-item label { font-size: 12px; color: rgba(255, 255, 255, 0.9); font-weight: 600; }
+    .setting-item select { padding: 6px 10px; font-size: 11px; outline: none; border-radius: 6px; }
+
+    .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+
+    .slider {
+      position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: .3s; border-radius: 20px;
+    }
+
+    .slider:before {
+      position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px;
+      background-color: white; transition: .3s; border-radius: 50%;
+    }
+
+    input:checked + .slider { background: linear-gradient(135deg, #28a745 0%, #208537 100%); }
+    input:checked + .slider:before { transform: translateX(22px); }
+
+    .wallpaper-preview-container { display: flex; gap: 16px; padding: 14px; border-radius: 12px; }
+    .preview-box { width: 180px; height: 100px; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.25); }
+    .preview-box img { width: 100%; height: 100%; object-fit: cover; }
+    .preview-info { flex: 1; display: flex; flex-direction: column; gap: 6px; justify-content: center; font-size: 11px; color: rgba(255, 255, 255, 0.7); }
+    .preview-info strong { color: #fff; }
+
+    body.theme-dark { background-color: #090a0f; color: #ffffff; }
+    body.theme-light { background-color: #e2e8f0; color: #1a1a1a; }
+
+    /* ปุ่ม Play ตอนที่กำลังโหลดมอด (สีดำจางๆ กดไม่ได้) */
+#btn-play.disabled {
+  background-color: rgba(20, 20, 20, 0.6);
+  color: #555555;
+  cursor: not-allowed;
+  pointer-events: none;
+  border: 1px solid #333333;
+}
+
+  </style>
+</head>
+<body class="theme-dark">
+
+  <!-- Titlebar -->
+  <div class="titlebar">
+    <span>LYWP ONLINE LAUNCHER</span>
+    <div class="titlebar-btns">
+      <button class="titlebar-btn btn-min" id="btn-minimize" title="Minimize"></button>
+      <button class="titlebar-btn btn-max" id="btn-maximize" title="Maximize/Restore"></button>
+      <button class="titlebar-btn btn-close" id="btn-close" title="Close"></button>
+    </div>
+  </div>
+
+  <div class="app-container">
+    <!-- Top News Toggle Button -->
+    <button class="toggle-news-btn liquid-glass-btn" id="toggle-news-btn" title="ข่าวสาร">▼</button>
+
+    <!-- News Panel -->
+    <div class="news-panel" id="news-panel">
+      <div class="news-grid">
+        <div class="news-card liquid-glass-card">
+          <img src="asset/news1.jpg" alt="Notice 1" onerror="this.src='https://via.placeholder.com/120x190/333/fff?text=Asset'">
+          <div class="news-card-content">
+            <div class="news-card-title">UPDATE PATCH 1.0.1</div>
+            <div class="news-card-desc">อัปเดตระบบการเชื่อมต่อใหม่ของ Private Server</div>
+          </div>
+        </div>
+        <div class="news-card liquid-glass-card">
+          <img src="asset/news2.jpg" alt="Notice 2" onerror="this.src='https://via.placeholder.com/120x190/333/fff?text=Asset'">
+          <div class="news-card-content">
+            <div class="news-card-title">WARNING</div>
+            <div class="news-card-desc">ขอให้สนุกกับการเล่นเกมแต่มึงห้ามใช้โปรหรือ Blueprint โกงๆนะมันดูตํ่า</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <img src="asset/logo.png" alt="LYWP TEAM" class="brand-logo" onerror="this.src='https://via.placeholder.com/200x80/transparent/fff?text=LYWP+TEAM'">
+    </div>
+
+    <!-- Bottom Left Controls -->
+    <div class="bottom-left-controls">
+      <div class="small-btn-group">
+        <button class="liquid-glass-btn btn-action-small" id="btn-install-ssl">Install CA</button>
+        <button class="liquid-glass-btn btn-action-small" id="btn-verify-mods">Fix Hosts</button>
+      </div>
+      
+      <select id="server-select" class="server-select-mini liquid-glass-input">
+        <option value="lywp">LYWP Official Server</option>
+        <option value="hsh">HSH Go Back OBT1</option>
+      </select>
+
+      <div class="btn-play-container">
+        <button class="btn-play" id="btn-launch">Run Game / Server</button>
+        <button class="btn-settings liquid-glass-btn" id="btn-open-settings" title="ตั้งค่า">⚙️</button>
+      </div>
+    </div>
+
+    <!-- Bottom Right Specs -->
+    <div class="bottom-right-specs liquid-glass-card">
+      <div class="specs-title">
+        <span>SYSTEM SPECS</span>
+        <span class="status-dot" id="server-dot" title="Status"></span>
+      </div>
+      <div class="specs-list">
+        <div class="specs-item"><span>Status:</span> <span id="system-status">CHECKING...</span></div>
+        <div class="specs-item"><span>CPU:</span> <span id="cpuText">Checking...</span></div>
+        <div class="specs-item"><span>RAM:</span> <span id="ramText">Checking...</span></div>
+        <div class="specs-item"><span>GPU:</span> <span id="gpuText">Checking...</span></div>
+        <div class="specs-item"><span>Disk:</span> <span id="diskText">Checking...</span></div>
+      </div>
+      <div class="disk-warning" id="diskWarning"></div>
+    </div>
+  </div>
+
+  <!-- POPUP SETTING OVERLAY -->
+  <div class="settings-overlay" id="settings-overlay">
+    <div class="settings-modal">
+      <button class="settings-close-btn" id="btn-close-settings">✕</button>
+      
+      <div class="settings-left-panel liquid-glass">
+        <h2 class="settings-title">SETTING</h2>
+        <div class="settings-menu-list">
+          <button class="glass-btn-side" id="btnToggleTheme">🎨 Switch Theme</button>
+          <button class="glass-btn-side" id="btnChangeBg">🖼️ Change Wallpaper</button>
+          <button class="glass-btn-side" id="btnResetBg">🔄 Reset Wallpaper</button>
+          <button class="glass-btn-side" id="btn-open-mod-folder">📂 Open Mods Folder [ใช้บ่ได้]</button>
+          <button class="glass-btn-side" id="btn-download-mod">📥 Download Default Mod [ใช้บ่ได้]</button>
+        </div>
+
+        <div class="version-section-popup liquid-glass-card">
+          <div class="version-title-popup">⚙️ PROJECT VERSION</div>
+          <button class="glass-btn-side btn-sidebar-action" id="btn-browse-folder">📁 Browse Folder</button>
+          <div class="version-info">Path: <span id="folder-path-display">Not Selected</span></div>
+
+          <div class="version-input-group">
+            <span class="version-label">Ver: <strong id="current-version-display">-</strong></span>
+            <input type="text" id="input-version" class="liquid-glass-input" placeholder="1.0.1">
+            <button class="btn-sidebar-save" id="btn-save-version">💾 Save</button>
+          </div>
+          <div class="version-status" id="version-status-text"></div>
+        </div>
+      </div>
+
+      <div class="settings-right-panel liquid-glass" id="settings-content-area">
+        <div class="setting-section-title">🖼️ WALLPAPER & DISPLAY</div>
+        <div class="wallpaper-preview-container liquid-glass-card">
+          <div class="preview-box">
+            <img id="bg-preview-img" src="bg.jpg" alt="Wallpaper Preview">
+          </div>
+          <div class="preview-info">
+            <div>Current Path: <strong id="preview-path-text">bg.jpg (Default)</strong></div>
+            <div>Resolution: <strong>1920 x 1080 (Auto Fit)</strong></div>
+            <div>Format: <strong>JPEG / Dynamic BG</strong></div>
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <div class="setting-item liquid-glass-card">
+            <label for="bg-brightness">Wallpaper Brightness</label>
+            <input type="range" id="bg-brightness" min="20" max="100" value="100">
+          </div>
+          <div class="setting-item liquid-glass-card">
+            <label for="bg-blur">Background Blur Effect</label>
+            <input type="range" id="bg-blur" min="0" max="20" value="0">
+          </div>
+          <div class="setting-item liquid-glass-card">
+            <label for="select-monitor">Target Display / Monitor</label>
+            <select id="select-monitor" class="liquid-glass-input">
+              <option value="primary">Monitor 1 (Primary)</option>
+              <option value="secondary">Monitor 2</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="setting-section-title">⚙️ GENERAL PREFERENCES</div>
+        <div class="setting-group">
+          <div class="setting-item liquid-glass-card">
+            <label>Start Launcher on Windows Startup</label>
+            <label class="switch">
+              <input type="checkbox" id="chk-autostart">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="setting-item liquid-glass-card">
+            <label>Close Launcher after launching game</label>
+            <label class="switch">
+              <input type="checkbox" id="chk-close-on-launch">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="setting-item liquid-glass-card">
+            <label for="select-lang">Language</label>
+            <select id="select-lang" class="liquid-glass-input">
+              <option value="th">ไทย (Thai)</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="setting-section-title">🚀 PERFORMANCE & SYSTEM</div>
+        <div class="setting-group">
+          <div class="setting-item liquid-glass-card">
+            <label>Pause background animations when in-game</label>
+            <label class="switch">
+              <input type="checkbox" id="chk-pause-bg" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="setting-item liquid-glass-card">
+            <label>Low Spec Hardware Optimization</label>
+            <label class="switch">
+              <input type="checkbox" id="chk-low-spec">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Elements
+    const btnMinimize = document.getElementById('btn-minimize');
+    const btnMaximize = document.getElementById('btn-maximize');
+    const btnClose = document.getElementById('btn-close');
+    const btnInstallSsl = document.getElementById('btn-install-ssl');
+    const btnVerifyMods = document.getElementById('btn-verify-mods');
+    const btnOpenModFolder = document.getElementById('btn-open-mod-folder');
+    const btnDownloadMod = document.getElementById('btn-download-mod');
+    const serverSelect = document.getElementById('server-select');
+    const btnLaunch = document.getElementById('btn-launch');
+    
+    // Setting Modal Controls
+    const btnOpenSettings = document.getElementById('btn-open-settings');
+    const btnCloseSettings = document.getElementById('btn-close-settings');
+    const settingsOverlay = document.getElementById('settings-overlay');
+
+    const toggleNewsBtn = document.getElementById('toggle-news-btn');
+    const newsPanel = document.getElementById('news-panel');
+    const systemStatus = document.getElementById('system-status');
+    const serverDot = document.getElementById('server-dot');
+
+    // Project Version Elements
+    const btnBrowseFolder = document.getElementById('btn-browse-folder');
+    const btnSaveVersion = document.getElementById('btn-save-version');
+    const folderPathDisplay = document.getElementById('folder-path-display');
+    const currentVersionDisplay = document.getElementById('current-version-display');
+    const inputVersion = document.getElementById('input-version');
+    const versionStatusText = document.getElementById('version-status-text');
+
+    // Theme Elements
+    const btnToggleTheme = document.getElementById('btnToggleTheme');
+    const btnChangeBg = document.getElementById('btnChangeBg');
+    const btnResetBg = document.getElementById('btnResetBg');
+
+    // Live Settings Controls
+    const bgPreviewImg = document.getElementById('bg-preview-img');
+    const previewPathText = document.getElementById('preview-path-text');
+    const bgBrightness = document.getElementById('bg-brightness');
+    const bgBlur = document.getElementById('bg-blur');
+
+    // Setting Overlay Modal
+    btnOpenSettings.addEventListener('click', () => {
+      settingsOverlay.classList.add('active');
+    });
+
+    btnCloseSettings.addEventListener('click', () => {
+      settingsOverlay.classList.remove('active');
+    });
+
+    settingsOverlay.addEventListener('click', (e) => {
+      if (e.target === settingsOverlay) {
+        settingsOverlay.classList.remove('active');
+      }
+    });
+
+    // Wallpaper Adjustments
+    bgBrightness.addEventListener('input', (e) => {
+      const val = e.target.value;
+      document.body.style.filter = `brightness(${val}%) blur(${bgBlur.value}px)`;
+    });
+
+    bgBlur.addEventListener('input', (e) => {
+      const val = e.target.value;
+      document.body.style.filter = `brightness(${bgBrightness.value}%) blur(${val}px)`;
+    });
+
+    // 1. Sliding Panel Controls
+    toggleNewsBtn.addEventListener('click', () => {
+      newsPanel.classList.toggle('active');
+      toggleNewsBtn.classList.toggle('open');
+    });
+
+    // 2. Window Controls
+    btnMinimize.addEventListener('click', () => window.electronAPI && window.electronAPI.minimize());
+    btnMaximize.addEventListener('click', () => window.electronAPI && window.electronAPI.maximize());
+    btnClose.addEventListener('click', () => window.electronAPI && window.electronAPI.close());
+
+    // 3. System & Mod Controls
+    btnInstallSsl.addEventListener('click', async () => {
+      if (window.electronAPI) {
+        const result = await window.electronAPI.installCert();
+        alert(result.message);
+      }
+    });
+
+    btnOpenModFolder.addEventListener('click', () => {
+      window.electronAPI && window.electronAPI.openModFolder();
+    });
+
+    btnDownloadMod.addEventListener('click', () => {
+      const gdriveUrl = prompt('กรุณาใส่ลิงก์ Google Drive หรือ URL มอดไฟล์ ZIP:');
+      if (gdriveUrl && window.electronAPI) {
+        systemStatus.innerText = 'DOWNLOADING...';
+        window.electronAPI.startDownloadMod(gdriveUrl);
+      }
+    });
+
+    btnVerifyMods.addEventListener('click', async () => {
+      if (!savedPath) {
+        alert('กรุณาเลือกตำแหน่งไฟล์เกมก่อนทำการตรวจสอบมอด');
+        return;
+      }
+      systemStatus.innerText = 'VERIFYING...';
+      if (window.electronAPI) {
+        const result = await window.electronAPI.verifyAndRepairMods(savedPath);
+        if (result.success) {
+          alert(result.repaired ? 'ทำการซ่อมแซมและลบไฟล์มอดที่ไม่ถูกต้องเรียบร้อยแล้ว!' : 'ไฟล์มอดสมบูรณ์แล้ว ไม่พบความเสียหาย');
+        } else {
+          alert('เกิดข้อผิดพลาดในการตรวจสอบ: ' + result.error);
+        }
+      }
+      systemStatus.innerText = 'ONLINE';
+    });
+
+    // 4. Server Switcher
+    serverSelect.addEventListener('change', async (e) => {
+      const selectedServer = e.target.value;
+      systemStatus.innerText = 'SWITCHING...';
+      if (window.electronAPI) {
+        const success = await window.electronAPI.switchServer(selectedServer);
+        if (success) {
+          checkServerStatus();
+        } else {
+          alert('ไม่สามารถสลับเซิร์ฟเวอร์ได้');
+        }
+      }
+    });
+
+    // 5. Game Launcher System
+    let savedPath = localStorage.getItem('hsho_game_path');
+
+    btnLaunch.addEventListener('click', async () => {
+      if (!savedPath) {
+        await selectAndSavePath();
+      } else {
+        launchSavedGame();
+      }
+    });
+
+    async function selectAndSavePath() {
+      systemStatus.innerText = 'SELECTING HSHO.EXE...';
+      if (window.electronAPI) {
+        const selectedPath = await window.electronAPI.selectGameFile();
+        if (selectedPath) {
+          savedPath = selectedPath;
+          localStorage.setItem('hsho_game_path', selectedPath);
+          launchSavedGame();
+        } else {
+          systemStatus.innerText = 'ONLINE';
+        }
+      }
+    }
+
+    async function launchSavedGame() {
+      systemStatus.innerText = 'LAUNCHING...';
+      if (window.electronAPI) {
+        const success = await window.electronAPI.launchGame(savedPath);
+        if (success) {
+          systemStatus.innerText = 'IN GAME';
+        } else {
+          alert('ไม่สามารถเปิดไฟล์เกมได้ กรุณาตรวจสอบตำแหน่งไฟล์อีกครั้ง');
+          systemStatus.innerText = 'ERROR';
+          localStorage.removeItem('hsho_game_path');
+          savedPath = null;
+        }
+      }
+    }
+
+    // 6. Project Version Controls
+    async function loadSavedMobwFolder() {
+      const savedFolder = localStorage.getItem('saved_mobw_folder');
+      if (savedFolder && window.electronAPI && window.electronAPI.getProjectVersion) {
+        folderPathDisplay.innerText = savedFolder;
+        versionStatusText.innerText = 'กำลังโหลดข้อมูล...';
+        const ver = await window.electronAPI.getProjectVersion(savedFolder);
+        if (ver) {
+          currentVersionDisplay.innerText = ver;
+          versionStatusText.style.color = '#00ff88';
+          versionStatusText.innerText = 'โหลดโฟลเดอร์เดิมเรียบร้อย';
+        } else {
+          currentVersionDisplay.innerText = 'ไม่พบไฟล์';
+          versionStatusText.style.color = '#ff4757';
+          versionStatusText.innerText = 'หาไฟล์ DefaultGame.ini ในโฟลเดอร์เดิมไม่พบ';
+        }
+      }
+    }
+
+    btnBrowseFolder.addEventListener('click', async () => {
+      if (window.electronAPI && window.electronAPI.selectMobwFolder) {
+        const res = await window.electronAPI.selectMobwFolder();
+        const folderPath = typeof res === 'object' ? res.folderPath : res;
+
+        if (folderPath) {
+          folderPathDisplay.innerText = folderPath;
+          localStorage.setItem('saved_mobw_folder', folderPath);
+          const ver = await window.electronAPI.getProjectVersion(folderPath);
+          currentVersionDisplay.innerText = ver || (res && res.currentVersion ? res.currentVersion : 'ไม่พบไฟล์');
+          versionStatusText.style.color = '#00ff88';
+          versionStatusText.innerText = 'บันทึกตำแหน่งโฟลเดอร์แล้ว';
+        }
+      }
+    });
+
+    btnSaveVersion.addEventListener('click', async () => {
+      const newVersion = inputVersion.value.trim();
+      const folderPath = folderPathDisplay.innerText;
+
+      if (folderPath === 'Not Selected' || folderPath === 'ยังไม่ได้เลือก' || !newVersion) {
+        versionStatusText.style.color = '#ff4757';
+        versionStatusText.innerText = 'กรุณาเลือกโฟลเดอร์และระบุเวอร์ชัน';
+        return;
+      }
+
+      if (window.electronAPI && window.electronAPI.saveProjectVersion) {
+        const res = await window.electronAPI.saveProjectVersion(folderPath, newVersion);
+        if (res.success) {
+          currentVersionDisplay.innerText = newVersion;
+          versionStatusText.style.color = '#00ff88';
+          versionStatusText.innerText = 'บันทึกเวอร์ชันสำเร็จ!';
+          inputVersion.value = '';
+        } else {
+          versionStatusText.style.color = '#ff4757';
+          versionStatusText.innerText = 'เกิดข้อผิดพลาด: ' + (res.message || res.error);
+        }
+      }
+    });
+
+    // 7. System Listeners
+    if (window.electronAPI) {
+      window.electronAPI.onDownloadProgress && window.electronAPI.onDownloadProgress((data) => {
+        systemStatus.innerText = `DOWNLOADING ${data.percent}%`;
+      });
+      window.electronAPI.onDownloadStatusText && window.electronAPI.onDownloadStatusText((text) => {
+        systemStatus.innerText = text.toUpperCase();
+      });
+      window.electronAPI.onDownloadComplete && window.electronAPI.onDownloadComplete(() => {
+        alert('ดาวน์โหลดและติดตั้งมอดเสร็จสิ้น!');
+        systemStatus.innerText = 'ONLINE';
+      });
+      window.electronAPI.onDownloadError && window.electronAPI.onDownloadError((err) => {
+        alert('เกิดข้อผิดพลาดในการดาวน์โหลด: ' + err);
+        systemStatus.innerText = 'ERROR';
+      });
+    }
+
+    // 8. Server Status Checker
+    async function checkServerStatus() {
+      try {
+        if (window.electronAPI && window.electronAPI.checkServerPing) {
+          const isOnline = await window.electronAPI.checkServerPing('127.0.0.1', 443);
+          systemStatus.innerText = isOnline ? 'ONLINE' : 'OFFLINE';
+          serverDot.classList.toggle('offline', !isOnline);
+        }
+      } catch (err) {
+        systemStatus.innerText = 'ONLINE';
+      }
+    }
+
+    // 9. Hardware Specs Checker
+    async function checkSystemSpecs() {
+      if (window.electronAPI && window.electronAPI.getSystemSpecs) {
+        const specs = await window.electronAPI.getSystemSpecs();
+        if (specs && specs.success) {
+          document.getElementById('cpuText').innerText = specs.cpu || 'N/A';
+          document.getElementById('ramText').innerText = `${specs.ramFreeGB} GB / ${specs.ramTotalGB} GB`;
+          document.getElementById('gpuText').innerText = specs.gpu || 'N/A';
+          document.getElementById('diskText').innerText = `${specs.diskFreeGB} GB คงเหลือ`;
+
+          if (parseFloat(specs.diskFreeGB) < 20) {
+            document.getElementById('diskWarning').innerText = '⚠️ พื้นที่ดิสก์เหลือน้อย';
+          }
+        }
+      }
+    }
+
+    // 10. Theme & Background Controls
+    function applyTheme(theme) {
+      document.body.classList.remove('theme-dark', 'theme-light');
+      document.body.classList.add(`theme-${theme}`);
+      localStorage.setItem('launcher_theme', theme);
+    }
+
+    function applyBackground(imagePath) {
+      if (imagePath) {
+        const formattedPath = `file://${imagePath.replace(/\\/g, '/')}`;
+        document.body.style.backgroundImage = `url('${formattedPath}')`;
+        bgPreviewImg.src = formattedPath;
+        previewPathText.innerText = imagePath;
+      } else {
+        document.body.style.backgroundImage = "url('bg.jpg')";
+        bgPreviewImg.src = "bg.jpg";
+        previewPathText.innerText = "bg.jpg (Default)";
+      }
+    }
+
+    btnToggleTheme.addEventListener('click', () => {
+      const currentTheme = document.body.classList.contains('theme-dark') ? 'dark' : 'light';
+      applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    });
+
+    btnChangeBg.addEventListener('click', async () => {
+      if (window.electronAPI && window.electronAPI.selectCustomBackground) {
+        const bgPath = await window.electronAPI.selectCustomBackground();
+        if (bgPath) {
+          localStorage.setItem('launcher_bg', bgPath);
+          applyBackground(bgPath);
+        }
+      }
+    });
+
+    btnResetBg.addEventListener('click', () => {
+      localStorage.removeItem('launcher_bg');
+      applyBackground(null);
+    });
+
+    // Init App State
+    const savedTheme = localStorage.getItem('launcher_theme') || 'dark';
+    applyTheme(savedTheme);
+
+    const savedBg = localStorage.getItem('launcher_bg');
+    if (savedBg) applyBackground(savedBg);
+
+    loadSavedMobwFolder();
+    checkSystemSpecs();
+    checkServerStatus();
+    setInterval(checkServerStatus, 30000);
+  </script>
+</body>
+</html>
