@@ -309,7 +309,7 @@ function startInternalProxy() {
   const localCerts = generateCerts();
   if (!localCerts) return;
 
-  const RENDER_HOST = 'malakor-api-1.onrender.com';
+  const RENDER_HOST = YOUR_RENDER_LINK';
 
   // 1. Direct HTTPS Server (Port 443 Direct Binding)
   try {
