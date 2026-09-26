@@ -81,3 +81,13 @@ dist/
 certs/*.key
 certs/*.crt
 ```
+Diractory
+```
+HSHO_Luncher
+L .env
+L main.js
+L preload.js
+L renderer.js
+L package.js
+L bg.jpg <= พื้นหลัง
+L icon.ico <= ไอคอนลันเชอร์
