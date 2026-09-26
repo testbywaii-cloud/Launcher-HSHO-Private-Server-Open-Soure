@@ -92,6 +92,5 @@ L package.js
 L bg.jpg <= พื้นหลัง
 L icon.ico <= ไอคอนลันเชอร์
 ```
-
-npm install electron-updater node-forge extract-zip adm-zip axios systeminformation
 ```
+npm install electron-updater node-forge extract-zip adm-zip axios systeminformation
