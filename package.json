@@ -29,7 +29,7 @@
   },
   "build": {
     "appId": "com.hsho.launcher",
-    "productName": "LYWP Launcher",
+    "productName": "ํYOUR_Launcher_NAME",
     "publish": [
       {
         "provider": "github",
