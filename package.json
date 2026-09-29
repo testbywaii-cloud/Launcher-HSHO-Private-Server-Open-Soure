@@ -2,13 +2,13 @@
   "name": "hsho-private-launcher",
   "version": "1.0.5",
   "description": "LYWP Private Launcher",
-  "author": "LYWP & Malakor",
+  "author": "ํYOUR_NAME_OR_TEXT",
   "main": "main.js",
   "type": "commonjs",
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "https://github.com/WAII-blip/Update/releases/tag/v1.0.2"
+    "url": "YOUR_LINK_GITHUB"
   },
   "scripts": {
     "start": "electron .",
@@ -33,7 +33,7 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "WAII-blip",
+        "owner": "YOUR_NAME_IN_GITHUB",
         "repo": "Update"
       }
     ],
