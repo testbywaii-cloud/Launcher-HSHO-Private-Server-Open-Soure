@@ -1,4 +1,4 @@
-# Home Sweet Home Online : Luncher Soure
+# Home Sweet Home Online : Luncher Soure [ใครโหลดไปใช้กรุณาให้ Credit LYWP Team ด้วย]
 
 This is the private launcher server of the game **Home Sweet Home Online** It runs through Client Proxy and Render
 
