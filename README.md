@@ -1,6 +1,6 @@
 # Home Sweet Home Online : Luncher Soure [ใครโหลดไปใช้กรุณาให้ Credit LYWP Team ด้วย]
 
-This is the private launcher server of the game **Home Sweet Home Online** It runs through Client Proxy and Render
+This is the private launcher server of the game **Home Sweet Home Online** It runs through Reverse Proxy and Render.com
 
 **Important**: You must own Home Sweet Home: Online in your Steam library (available before Jan 31, 2025) to use this server This repo might be maintained just for some funnies
 
@@ -92,5 +92,10 @@ L package.js
 L bg.jpg <= พื้นหลัง
 L icon.ico <= ไอคอนลันเชอร์
 ```
+Paste in CMD on Visual Code Studio
 ```
 npm install electron-updater node-forge extract-zip adm-zip axios systeminformation
+
+```
+
+
